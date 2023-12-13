@@ -1,28 +1,39 @@
-# BDSP Extract Pipeline
 
-This document provides instructions on how to run Python scripts in the Dockerized environment of the BDSP Extract Pipeline.
+# Updated README for Running Airflow DAGs
 
-## Getting Started
+## Prerequisites:
+- Docker and Docker Compose installed on your machine.
+- Clone the repository containing the Docker Compose file and the related folders.
 
-These instructions will get you through the process of running a Python script inside a Docker container.
+## Starting the Environment:
+### Start the Services:
+- Navigate to the directory containing the Docker Compose file.
+- Run `docker-compose up -d` to start all the services in detached mode.
 
-### Prerequisites
+### Verify Services:
+- Ensure that the MySQL, Spark, and Airflow services are running correctly.
+- Access phpMyAdmin at `http://localhost:8082` to check the MySQL database.
+- Spark Master UI available at `http://localhost:8080`.
+- Airflow Webserver accessible at `http://localhost:8081`.
 
-Before you begin, make sure you have the following installed:
-- Docker
-- Docker Compose
+## Adding and Running the DAGs:
+### Prepare the DAG Files:
+- Place the `live_data_pipeline.py` and `historic_pipeline.py` files in the `../bdsp-extract-pipe/dags` directory. This directory is mounted into the Airflow container.
 
-### Running the Script
+### Access Airflow Web Interface:
+- Open `http://localhost:8081` in a web browser to access the Airflow UI.
 
-To execute the `extract.py` script inside the Docker container, follow these steps:
+### Trigger the DAGs:
+- In the Airflow UI, locate the `live_data_pipeline` and `historic_data_pipeline` DAGs.
+- Manually trigger each DAG or set up a schedule for automatic execution.
 
-The docker-compose file is inside the `bdsp-services` repo.
-1. Start your Docker containers using Docker Compose:
-   
-   ```bash
-   docker-compose up -d
+### Monitoring and Logs:
+- Use the Airflow web interface to monitor the status of your DAGs.
+- Check the logs in the Airflow UI for each task to debug if needed.
 
-2. Once the containers are running, you can execute the `extract.py` script inside the `spark-worker` container with the following command:
+## Stopping the Environment:
+- To stop and remove the containers, networks, and volumes created by Docker Compose, run `docker-compose down`.
 
-    ```bash
-    docker exec -it services_spark-worker_1 python extract.py
+## Notes:
+- Ensure that the Python scripts referenced in the DAGs are present in the correct paths as specified in the Docker Compose volume mounts.
+- Update environment variables and ports in the Docker Compose file as needed based on your specific requirements.
