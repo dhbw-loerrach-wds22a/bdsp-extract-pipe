@@ -5,6 +5,20 @@
 - Docker and Docker Compose installed on your machine.
 - Clone the repository containing the Docker Compose file and the related folders.
 
+## Repository setup
+Clone the repositories from [GitHub](https://github.com/dhbw-loerrach-wds22a)
+1. [bdsp-setup](https://github.com/dhbw-loerrach-wds22a/bdsp-setup)
+3. [bdsp-extract-pipe](https://github.com/dhbw-loerrach-wds22a/bdsp-extract-pipe)
+4. [bdsp-services](https://github.com/dhbw-loerrach-wds22a/bdsp-services)
+
+Layout of the repositories:
+
+Project folder
+  - bdsp-setup
+  - bdsp-extract-pipe
+  - bdsp-services
+### Usage
+
 ## Starting the Environment:
 ### Start the Services:
 - Navigate to the directory containing the Docker Compose file.
@@ -37,3 +51,11 @@
 ## Notes:
 - Ensure that the Python scripts referenced in the DAGs are present in the correct paths as specified in the Docker Compose volume mounts.
 - Update environment variables and ports in the Docker Compose file as needed based on your specific requirements.
+
+## Contributing
+
+Contributions to improve or extend the functionality are welcome. Please submit pull requests with detailed descriptions of changes or enhancements.
+
+## License
+
+MIT
