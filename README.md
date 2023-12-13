@@ -17,7 +17,6 @@ Project folder
   - bdsp-setup
   - bdsp-extract-pipe
   - bdsp-services
-### Usage
 
 ## Starting the Environment:
 ### Start the Services:
