@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession
 import mysql.connector
 from mysql.connector import Error
+import datetime
 
 from minio_bucket import *
 
@@ -26,7 +27,10 @@ def read_data_from_mysql():
             password='mypassword'      
         )
         cursor = connection.cursor()
-        cursor.execute("SELECT DISTINCT * FROM events LIMIT 1000")
+        yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        query = f"SELECT DISTINCT * FROM events WHERE event_time = '{yesterday}'"
+        cursor.execute(query)
+
         result = cursor.fetchall()
         columns = cursor.column_names
         connection.close()
@@ -38,7 +42,8 @@ def read_data_from_mysql():
 
 def write_data_to_minio(spark, data, columns):
     df = spark.createDataFrame(data, schema=columns)
-    df.write.mode("overwrite").option("header", "true").csv("s3a://datacache/extracted_data.csv")
+    today = datetime.date.today().strftime('%Y-%m-%d')
+    df.write.mode("overwrite").option("header", "true").csv(f"s3a://datacache/extracted_data_{today}.csv")
     print("Daten erfolgreich in MinIO hochgeladen.")
 
 

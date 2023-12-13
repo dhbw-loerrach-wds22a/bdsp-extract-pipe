@@ -1,5 +1,8 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import isnan, when, count, col
+import datetime
+
+from pyspark.sql.types import DoubleType, FloatType
 
 
 def initialize_spark_session():
@@ -15,33 +18,36 @@ def initialize_spark_session():
         .getOrCreate()
 
 
-def read_data(spark, file_path):
+def read_historical_data(spark):
+    file_path = f"s3a://datacache/h_extracted_data.csv"
     return spark.read.csv(file_path, header=True, inferSchema=True)
 
-
 def find_error_values(df):
-    # Bedingung für leere oder null Spalten
     condition = None
     for c in df.columns:
-        current_condition = (col(c).isNull() | (col(c) == ''))
+        # Check for null values in all columns
+        current_condition = col(c).isNull()
+        # Additional check for isnan only if the column type is DoubleType or FloatType
+        if isinstance(df.schema[c].dataType, (DoubleType, FloatType)):
+            current_condition = current_condition | isnan(col(c))
+
         condition = current_condition if condition is None else condition | current_condition
 
-    # Filtern der Zeilen, die die Bedingung erfüllen
     df_errors = df.filter(condition)
     return df_errors
 
-
-def write_data(df, file_path):
+def write_historical_data(df):
+    file_path = f"s3a://datacache/h_error_values.csv"
     df.write.mode("overwrite").option("header", "true").csv(file_path)
-
 
 def main():
     spark = initialize_spark_session()
-    df = read_data(spark, "s3a://datacache/extracted_data.csv")
-    df_errors = find_error_values(df)
-    write_data(df_errors, "s3a://datacache/error_values.csv")
-    spark.stop()
 
+    df = read_historical_data(spark)
+    df_errors = find_error_values(df)
+    write_historical_data(df_errors)
+
+    spark.stop()
 
 if __name__ == "__main__":
     main()

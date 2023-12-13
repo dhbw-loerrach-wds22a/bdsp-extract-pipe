@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
+import datetime
 
 
 def initialize_spark_session():
@@ -15,25 +16,28 @@ def initialize_spark_session():
         .getOrCreate()
 
 
-def read_data(spark, file_path):
+def read_historical_data(spark):
+    file_path = f"s3a://datacache/h_extracted_data.csv"
     return spark.read.csv(file_path, header=True, inferSchema=True)
 
 
 def filter_free_products(df):
-    return df.filter(col("price") == 0)
+    return df.filter(col("price") == 0).distinct()
 
 
 def select_relevant_columns(df):
     return df.select("product_id", "brand", "price")
 
 
-def write_data(df, file_path):
+def write_historical_data(df):
+    file_path = f"s3a://datacache/h_free_product_data.csv"
     df.write.mode("overwrite").option("header", "true").csv(file_path)
 
 
 def main():
     spark = initialize_spark_session()
-    df = read_data(spark, "s3a://datacache/extracted_data.csv")
+
+    df = read_historical_data(spark)
     
     df_free_products = filter_free_products(df)
     df_relevant = select_relevant_columns(df_free_products)
@@ -44,7 +48,7 @@ def main():
     for product in free_product_list:
         print("Product ID:", product["product_id"], "- Brand:", product["brand"])
 
-    write_data(df_relevant, "s3a://datacache/free_product_data.csv")
+    write_historical_data(df_relevant)
     spark.stop()
 
 if __name__ == "__main__":
