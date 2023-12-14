@@ -17,17 +17,17 @@ def initialize_spark_session():
 
 
 def read_new_data(spark):
-    today = datetime.date.today().strftime('%Y-%m-%d')
-    file_path = f"s3a://datawarehouse/core_data_{today}.csv"
+    file_path = f"s3a://datawarehouse/core_data.csv"
     return spark.read.csv(file_path, header=True, inferSchema=True)
 
 
 def filter_valid_data(df):
-    return df.filter(~(isnan(col("category_code")) | isnan(col("product_id"))))
+    df = df.drop_duplicates()
+    return df.filter(~(isnan(col("main_category")) | isnan(col("product_id"))))
 
 
 def append_to_existing_ml_data(df):
-    existing_file_path = "s3a://datacache/ml_data.csv"
+    existing_file_path = "s3a://datawarehouse/ml_data.csv"
     df.write.mode("append").option("header", "true").csv(existing_file_path)
 
 

@@ -29,20 +29,21 @@ def move_data(spark, source_path, destination_path):
 def main():
     spark = initialize_spark_session()
 
-    historical_date = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')  # Datum von gestern
     files_to_move = [
-        f"h_core_data.csv", 
+        f"h_core_data.csv",
         f"h_revenue_data.csv", 
         f"h_free_product_data.csv", 
-        f"h_error_values.csv", 
-        f"ml_data.csv"
+        f"h_error_values.csv"
     ]
 
     source_bucket = "s3a://datacache/"
     destination_bucket = "s3a://datawarehouse/"
 
     for file_name in files_to_move:
-        move_data(spark, source_bucket + file_name, destination_bucket + file_name)
+        if "h_" == file_name[0:2]:
+            move_data(spark, source_bucket + file_name, destination_bucket + file_name[2:])
+        else:
+            move_data(spark, source_bucket + file_name, destination_bucket + file_name)
 
     spark.stop()
 

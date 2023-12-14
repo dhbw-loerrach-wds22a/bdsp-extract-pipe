@@ -27,8 +27,14 @@ def read_data_from_mysql():
             password='mypassword'      
         )
         cursor = connection.cursor()
-        yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-        query = f"SELECT DISTINCT * FROM events WHERE event_time = '{yesterday}'"
+
+        # Calculate yesterday's date and time range
+        yesterday = datetime.date.today() - datetime.timedelta(days=1)
+        start_of_yesterday = datetime.datetime.combine(yesterday, datetime.time.min).strftime('%Y-%m-%d %H:%M:%S')
+        end_of_yesterday = datetime.datetime.combine(yesterday, datetime.time.max).strftime('%Y-%m-%d %H:%M:%S')
+
+        # Update the query to select data between start and end of yesterday
+        query = f"SELECT DISTINCT * FROM events_live WHERE event_time BETWEEN '{start_of_yesterday}' AND '{end_of_yesterday}'"
         cursor.execute(query)
 
         result = cursor.fetchall()

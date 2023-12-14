@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import split, col, sha2, concat_ws
+from pyspark.sql.functions import split, col, sha2, concat_ws, coalesce, lit
 import datetime
 
 
@@ -23,7 +23,7 @@ def read_data_from_minio(spark):
 
 
 def transform_data(df):
-    split_col = split(coalesce(col("category_code"), "unknown.unknown.unknown"), "\\.")
+    split_col = split(coalesce(col("category_code"), lit("unknown.unknown.unknown")), "\\.")
     df = df.withColumn("main_category", split_col.getItem(0))
     df = df.withColumn("sub_category", split_col.getItem(1))
     df = df.withColumn("subsub_category", split_col.getItem(2))

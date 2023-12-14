@@ -9,7 +9,12 @@ default_args = {
     'start_date': datetime(2023, 12, 13),
 }
 
-dag = DAG('live_data_pipeline', default_args=default_args, schedule_interval=None)
+dag = DAG(
+    'live_data_pipeline',
+    default_args=default_args,
+    schedule_interval="11 09 * * *",  # Schedule the DAG to run daily at 09:11
+    catchup=False  # Set to False if you don't want to perform a backfill of missing runs
+)
 
 extract_data = SparkSubmitOperator(
     task_id='extract_data',

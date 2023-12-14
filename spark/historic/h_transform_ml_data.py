@@ -22,6 +22,7 @@ def read_historical_data(spark):
 
 
 def filter_valid_data(df):
+    df = df.drop_duplicates()
     return df.filter(~(isnan(col("main_category")) | isnan(col("product_id"))))
 
 

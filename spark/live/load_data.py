@@ -43,7 +43,7 @@ def main():
     destination_bucket = "s3a://datawarehouse/"
 
     for file_name in files_to_move:
-        move_data(spark, source_bucket + file_name, destination_bucket + file_name)
+        move_data(spark, source_bucket + file_name, destination_bucket + file_name.replace(f"_{today}", ""))
 
     spark.stop()
 
