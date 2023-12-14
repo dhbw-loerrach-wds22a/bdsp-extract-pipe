@@ -28,7 +28,7 @@ def filter_valid_data(df):
 
 def append_to_existing_ml_data(df):
     existing_file_path = "s3a://datawarehouse/ml_data.csv"
-    df.write.mode("append").option("header", "true").csv(existing_file_path)
+    df.write.mode("overwrite").option("header", "true").csv(existing_file_path)
 
 
 def main():
